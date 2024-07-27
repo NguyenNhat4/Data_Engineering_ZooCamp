@@ -6,6 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine # type: ignore
 import argparse
 from time import time
+import requests
 
 def main(params):
     username = params.username
@@ -16,19 +17,19 @@ def main(params):
     db = params.db
     url = params.url
     csv_name = 'output.csv'
+    response = requests.get(url)
 
-    
-    os.system(f"wget {url} -O {csv_name}")
+    with open(csv_name, 'wb') as file:
+        file.write(response.content)
+
+    # os.system(f"wget {url} -O {csv_name}")
     engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{db}')
 
     
-
     df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
-    df.head(n=0).to_sql(name=table_name , con=engine, if_exists='replace')
+    df = next(df_iter)
+    df[0].to_sql(name=table_name , con=engine, if_exists='replace')
     df.to_sql(name=table_name , con=engine, if_exists='append')
-
-
-
 
 
     while True:
