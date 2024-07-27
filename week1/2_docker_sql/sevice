@@ -45,7 +45,8 @@ docker run -it \
 
 
 ## script to run ingest_data.py
-URL="https://github.com/NguyenNhat4/Data_Engineering_ZooCamp/blob/main/week1/2_docker_sql/yellow_tripdata_2021-07.csv "
+URL='https://media.githubusercontent.com/media/NguyenNhat4/Data_Engineering_ZooCamp/main/week1/2_docker_sql/yellow_tripdata_2021-07.csv'
+
 python ingest_data.py \
 --username=root  \
 --password=root \
@@ -56,18 +57,18 @@ python ingest_data.py \
 --url=${URL}
 
 
+
+## Containerize ingest_data.py
 docker build -t taxi_ingest:v001 .
 
+URL='https://media.githubusercontent.com/media/NguyenNhat4/Data_Engineering_ZooCamp/main/week1/2_docker_sql/yellow_tripdata_2021-07.csv'
 
-URL="https://github.com/NguyenNhat4/Data_Engineering_ZooCamp/blob/main/week1/2_docker_sql/yellow_tripdata_2021-07.csv "
 docker run  -it \
   --network=pg-network \
-   -v /c/Users/admin/Desktop/Data_engineering_zoocamp/week1/2_docker_sql/ny_taxy_posges_data:/app/data \
-
    taxi_ingest:v001 \
       --user=root  \
       --password=root \
-      --host=localhost \
+      --host=pg-database \
       --port=5432 \
       --db=ny_taxi \
       --table_name=yellow_taxi_data \

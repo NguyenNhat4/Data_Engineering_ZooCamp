@@ -7,3 +7,5 @@ day  =  sys.argv[1]
 
 
 print(f"job finish successfully for day = {day}")
+
+

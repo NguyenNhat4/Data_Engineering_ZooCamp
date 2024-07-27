@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
-import os
 import argparse
 import pandas as pd 
-from sqlalchemy import create_engine # type: ignore
+from sqlalchemy import create_engine
 import argparse
 from time import time
-import requests
+import urllib.request
+
 
 def main(params):
     username = params.username
@@ -17,27 +17,26 @@ def main(params):
     db = params.db
     url = params.url
     csv_name = 'output.csv'
-    response = requests.get(url)
+    print("downloading data from source....\n")
+    urllib.request.urlretrieve(url, csv_name)
 
-    with open(csv_name, 'wb') as file:
-        file.write(response.content)
 
     # os.system(f"wget {url} -O {csv_name}")
     engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{db}')
-
-    
+    engine.connect
     df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
+    print("read csv....\n")
+
     df = next(df_iter)
-    df[0].to_sql(name=table_name , con=engine, if_exists='replace')
-    df.to_sql(name=table_name , con=engine, if_exists='append')
-
-
+    df.head(n=0).to_sql(name=table_name , con=engine,if_exists='replace')  
+    df.to_sql(name=table_name, con=engine, if_exists='append')
+    print("Start ingresting data into database ...\n")
     while True:
         t_start = time()
         df = next(df_iter)
         df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
         df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
-        df.to_sql(name='yellow_taxi_data' , con=engine, if_exists='append')
+        df.to_sql(name=table_name , con=engine, if_exists='append')
         t_end = time()
         print('insert another chunk, took %.3f second' % (t_end-t_start))
         
