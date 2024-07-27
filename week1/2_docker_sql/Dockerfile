@@ -1,12 +1,13 @@
 FROM python:3.9
 
 RUN apt-get update && apt-get install -y bash
-
-RUN pip install pandas
+RUN apt-get install wget
+RUN 
+RUN pip install pandas sqlalchemy psycopg2
 
 WORKDIR /app
 
-COPY pipeline.py pipeline.py
+COPY ingest_data.py ingest_data.py
 
 
-ENTRYPOINT [ "python","pipeline.py" ]
+ENTRYPOINT [ "python","ingest_data.py" ] 
